@@ -86,10 +86,7 @@ namespace STConnect_192152K
             }
             else
             {
-                lbl_login_status.Text = "Not Logged in";
-                lbl_login_status.Visible = true;
-                btn_Login.Visible = true;
-                hl_register.Visible = true;
+                Response.Redirect("/login.aspx");
             }
         }
 
