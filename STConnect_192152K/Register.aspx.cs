@@ -9,7 +9,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
-
+using System.Net;
+using System.IO;
+using System.Web.Script.Serialization;
 
 namespace STConnect_192152K
 {
@@ -30,7 +32,7 @@ namespace STConnect_192152K
         {
             bool validated = Validation();
             // check if everything is valid
-            if (validated)
+            if (validated && ValidateCaptcha())
             {
                 string password = tb_pass.Text.ToString().Trim();
 
@@ -281,6 +283,51 @@ namespace STConnect_192152K
             catch(Exception ex) {
                 throw new Exception(ex.ToString());
             }
+        }
+        public bool ValidateCaptcha()
+        {
+            bool result = true;
+
+
+            string captchaResponse = Request.Form["g-recaptcha-response"];
+
+
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create
+                ("https://www.google.com/recaptcha/api/siteverify?secret=6Lezv0kaAAAAAE2SXbd_gCiW8HINEhnBKoWz8M76 &response=" + captchaResponse);
+
+            try
+            {
+
+                using (WebResponse webRes = req.GetResponse())
+                {
+                    using (StreamReader readStream = new StreamReader(webRes.GetResponseStream()))
+                    {
+                        // The response in JSON format
+                        string jsonResponse = readStream.ReadToEnd();
+
+                        JavaScriptSerializer js = new JavaScriptSerializer();
+
+                        // Create jsonObject to handle the response i.e. success or error
+                        // Deserialize Json
+                        MyObject jsonObject = js.Deserialize<MyObject>(jsonResponse);
+
+                        // Convert the string
+                        result = Convert.ToBoolean(jsonObject.success);
+                    }
+                }
+
+                return result;
+            }
+            catch (WebException ex)
+            {
+                throw ex;
+            }
+        }
+
+        public class MyObject
+        {
+            public string success { get; set; }
+            public List<string> ErrorMessage { get; set; }
         }
     }
 }

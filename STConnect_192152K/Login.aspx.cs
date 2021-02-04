@@ -8,6 +8,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
+using System.IO;
+using System.Web.Script.Serialization;
 
 namespace STConnect_192152K
 {
@@ -47,9 +50,18 @@ namespace STConnect_192152K
                         byte[] hashWSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(passWSalt));
                         string userhash = Convert.ToBase64String(hashWSalt);
 
-                        if( userhash == dbHash)
+                        if( userhash == dbHash && ValidateCaptcha())
                         {
                             Session["loggedIn"] = tb_login_email.Text.ToString().Trim();
+
+                            // reset failed attempts after sucessful log in
+                            SqlConnection con = new SqlConnection(DBconnect);
+                            string sqlstr = "UPDATE [Account] SET Login_fail = 0 WHERE Email=@email";
+                            SqlCommand cmd = new SqlCommand(sqlstr, con);
+                            cmd.Parameters.AddWithValue("@email", email);
+                            con.Open();
+                            cmd.ExecuteNonQuery();
+                            con.Close();
 
                             // create a GUID
                             string guid = Guid.NewGuid().ToString();
@@ -196,6 +208,52 @@ namespace STConnect_192152K
             cmd.ExecuteNonQuery();
             con.Close();
         }
+        public bool ValidateCaptcha()
+        {
+            bool result = true;
+
+            
+            string captchaResponse = Request.Form["g-recaptcha-response"];
+
+            
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create
+                ("https://www.google.com/recaptcha/api/siteverify?secret=6Lezv0kaAAAAAE2SXbd_gCiW8HINEhnBKoWz8M76 &response=" + captchaResponse);
+
+            try
+            {
+                
+                using (WebResponse webRes = req.GetResponse())
+                {
+                    using (StreamReader readStream = new StreamReader(webRes.GetResponseStream()))
+                    {
+                        // The response in JSON format
+                        string jsonResponse = readStream.ReadToEnd();
+
+                        JavaScriptSerializer js = new JavaScriptSerializer();
+
+                        // Create jsonObject to handle the response i.e. success or error
+                        // Deserialize Json
+                        MyObject jsonObject = js.Deserialize<MyObject>(jsonResponse);
+
+                        // Convert the string
+                        result = Convert.ToBoolean(jsonObject.success);
+                    }
+                }
+
+                return result;
+            }
+            catch (WebException ex)
+            {
+                throw ex;
+            }
+        }
+
+        public class MyObject
+        {
+            public string success { get; set; }
+            public List<string> ErrorMessage { get; set; }
+        }
+
 
     }
 }
