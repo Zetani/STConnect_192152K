@@ -76,7 +76,8 @@
 
         function matchpass() {
             var pass = document.getElementById("<%= tb_pass.ClientID %>").value; 
-            if (pass != document.getElementById("<%= tb_cfmpass.ClientID %>").value) {
+            var cfmpass = document.getElementById("<%= tb_cfmpass.ClientID %>");
+            if (pass != cfmpass.value) {
                 document.getElementById("lbl_cfmpass_status").innerHTML = "Passwords do not match";
                 document.getElementById("lbl_cfmpass_status").style.color = "Red";
             }
@@ -194,7 +195,7 @@
         }
     </script>
      
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lezv0kaAAAAAF9NQ5KCuf0mDwGlt276IcZ6Bibl"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render="></script>
      
 </head>
 <body>
@@ -249,7 +250,7 @@
                         <asp:Label ID="Password" runat="server" Text="Password" ></asp:Label>
                         :</td>
                     <td class="auto-style11">
-                        <asp:TextBox ID="tb_pass" runat="server" onkeyup="javascript:validatepass()"></asp:TextBox>
+                        <asp:TextBox ID="tb_pass" runat="server" onkeyup="javascript:validatepass()" ></asp:TextBox>
                     </td>
                     <td class="auto-style13">
                         <asp:Label ID="lbl_pass_status" runat="server"></asp:Label>

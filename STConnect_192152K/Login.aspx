@@ -13,7 +13,7 @@
             width: 100%;
         }
     </style>
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lezv0kaAAAAAF9NQ5KCuf0mDwGlt276IcZ6Bibl"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render="></script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -34,7 +34,7 @@
                         <asp:Label ID="Label2" runat="server" Text="Password"></asp:Label>
                         :</td>
                     <td>
-                        <asp:TextBox ID="tb_login_pass" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_login_pass" runat="server" ></asp:TextBox>
                     </td>
                     <td>&nbsp;</td>
                 </tr>

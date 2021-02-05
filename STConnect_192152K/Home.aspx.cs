@@ -32,7 +32,7 @@ namespace STConnect_192152K
                     btn_logout.Visible = true;
 
                     SqlConnection con = new SqlConnection(DBconnect);
-                    string sqlstr = "select * from [Account] where Email = @email";
+                    string sqlstr = "select * from [Table] where Email = @email";
                     SqlCommand cmd = new SqlCommand(sqlstr, con);
                     cmd.Parameters.AddWithValue("@email", Session["loggedIn"].ToString());
 
@@ -55,10 +55,7 @@ namespace STConnect_192152K
                                 {
                                     fname = reader["First_name"].ToString();
                                 }
-                                if(reader["Last_name"] != DBNull.Value)
-                                {
-                                    lname = reader["Last_name"].ToString();
-                                }
+                                
                             }
                         }
                     } 
@@ -72,7 +69,7 @@ namespace STConnect_192152K
                     }
                     lbl_DOB.Text = "DOB: " + dob;
                     lbl_email.Text = "Email: " + email;
-                    lbl_welcome.Text = "Welcome " + fname + lname;
+                    lbl_welcome.Text = "Welcome " + fname ;
 
 
                 }

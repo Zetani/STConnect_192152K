@@ -50,13 +50,13 @@ namespace STConnect_192152K
                         byte[] hashWSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(passWSalt));
                         string userhash = Convert.ToBase64String(hashWSalt);
 
-                        if( userhash == dbHash && ValidateCaptcha())
+                        if( userhash == dbHash )
                         {
                             Session["loggedIn"] = tb_login_email.Text.ToString().Trim();
 
                             // reset failed attempts after sucessful log in
                             SqlConnection con = new SqlConnection(DBconnect);
-                            string sqlstr = "UPDATE [Account] SET Login_fail = 0 WHERE Email=@email";
+                            string sqlstr = "UPDATE [Table] SET Fail_login = 0 WHERE Email=@email";
                             SqlCommand cmd = new SqlCommand(sqlstr, con);
                             cmd.Parameters.AddWithValue("@email", email);
                             con.Open();
@@ -74,7 +74,7 @@ namespace STConnect_192152K
                         }
                         else
                         {
-                            lbl_msg.Text = "Email or Password incorrect. Please try again 2";
+                            lbl_msg.Text = "Email or Password incorrect. Please try again";
                             addFail(email);
                         }
                     }
@@ -95,7 +95,7 @@ namespace STConnect_192152K
         {
             string h = null;
             SqlConnection con = new SqlConnection(DBconnect);
-            string sqlstr = "select Password FROM [Account] WHERE Email=@Email";
+            string sqlstr = "select Hash_pass FROM [Table] WHERE Email=@Email";
             SqlCommand cmd = new SqlCommand(sqlstr, con);
             cmd.Parameters.AddWithValue("@Email", email);
             try
@@ -106,11 +106,11 @@ namespace STConnect_192152K
 
                     while (reader.Read())
                     {
-                        if (reader["Password"] != null)
+                        if (reader["Hash_pass"] != null)
                         {
-                            if (reader["Password"] != DBNull.Value)
+                            if (reader["Hash_pass"] != DBNull.Value)
                             {
-                                h = reader["Password"].ToString();
+                                h = reader["Hash_pass"].ToString();
                             }
                         }
                     }
@@ -129,7 +129,7 @@ namespace STConnect_192152K
         {
             string s = null;
             SqlConnection con = new SqlConnection(DBconnect);
-            string sqlstr = "select Pass_salt FROM [Account] WHERE Email=@Email";
+            string sqlstr = "select Pass_salt FROM [Table] WHERE Email=@Email";
             SqlCommand cmd = new SqlCommand(sqlstr, con);
             cmd.Parameters.AddWithValue("@Email", email);
             try
@@ -163,7 +163,7 @@ namespace STConnect_192152K
         {
             int count = 0;
             SqlConnection con = new SqlConnection(DBconnect);
-            string sqlstr = "select Login_fail FROM [Account] WHERE Email=@Email";
+            string sqlstr = "select Fail_login FROM [Table] WHERE Email=@Email";
             SqlCommand cmd = new SqlCommand(sqlstr, con);
             cmd.Parameters.AddWithValue("@Email", email);
             try
@@ -174,11 +174,11 @@ namespace STConnect_192152K
 
                     while (reader.Read())
                     {
-                        if (reader["Login_fail"] != null)
+                        if (reader["Fail_login"] != null)
                         {
-                            if (reader["Login_fail"] != DBNull.Value)
+                            if (reader["Fail_login"] != DBNull.Value)
                             {
-                                string strcount = reader["Login_fail"].ToString();
+                                string strcount = reader["Fail_login"].ToString();
                                 count = int.Parse(strcount);
                             }
                         }
@@ -199,7 +199,7 @@ namespace STConnect_192152K
             int Fails = getDBLoginFail(email);
 
             SqlConnection con = new SqlConnection(DBconnect);
-            string sqlstr = "UPDATE [Account] SET Login_fail =@login_fail WHERE Email=@email";
+            string sqlstr = "UPDATE [Table] SET Fail_login =@login_fail WHERE Email=@email";
             SqlCommand cmd = new SqlCommand(sqlstr, con);
             int addfail = Fails + 1;
             cmd.Parameters.AddWithValue("@login_fail", addfail);
@@ -217,7 +217,7 @@ namespace STConnect_192152K
 
             
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create
-                ("https://www.google.com/recaptcha/api/siteverify?secret=6Lezv0kaAAAAAE2SXbd_gCiW8HINEhnBKoWz8M76 &response=" + captchaResponse);
+                ("https://www.google.com/recaptcha/api/siteverify?secret= &response=" + captchaResponse);
 
             try
             {

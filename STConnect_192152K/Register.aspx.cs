@@ -32,7 +32,7 @@ namespace STConnect_192152K
         {
             bool validated = Validation();
             // check if everything is valid
-            if (validated && ValidateCaptcha())
+            if (validated)
             {
                 string password = tb_pass.Text.ToString().Trim();
 
@@ -66,7 +66,7 @@ namespace STConnect_192152K
 
                 Session["registered"] = "Registered";
 
-                Response.Redirect("Login.aspx");
+                Response.Redirect("login.aspx");
 
             }
         }
@@ -205,7 +205,7 @@ namespace STConnect_192152K
             {
                 using(SqlConnection con = new SqlConnection(DBconnect))
                 {
-                    using(SqlCommand cmd = new SqlCommand("INSERT INTO [Account] VALUES(@First_name, @Last_name, @Email, @DOB, @pass_salt, @passhash, @Credit_Card_Number, @Credit_Card_Expiry, @Credit_Card_CVC, 0, @CCIV, @CCKey)"))
+                    using(SqlCommand cmd = new SqlCommand("INSERT INTO [Table] VALUES(@First_name, @Last_name, @Email, @DOB, @pass_salt, @passhash, @Credit_Card_Number, @Credit_Card_Expiry, @Credit_Card_CVC, 0, @CCIV, @CCKey)"))
                     {
                         cmd.CommandType = CommandType.Text;
                         cmd.Parameters.AddWithValue("@First_name", tb_fname.Text.ToString().Trim());
@@ -260,7 +260,7 @@ namespace STConnect_192152K
             try
             {
                 using (SqlConnection con = new SqlConnection(DBconnect)) {
-                    string sqlstr = "Select Email from [Account] where Email=@email";
+                    string sqlstr = "Select Email from [Table] where Email=@email";
 
                     using (SqlCommand cmd = new SqlCommand(sqlstr, con))
                     {
@@ -293,7 +293,7 @@ namespace STConnect_192152K
 
 
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create
-                ("https://www.google.com/recaptcha/api/siteverify?secret=6Lezv0kaAAAAAE2SXbd_gCiW8HINEhnBKoWz8M76 &response=" + captchaResponse);
+                ("https://www.google.com/recaptcha/api/siteverify?secret= &response=" + captchaResponse);
 
             try
             {
